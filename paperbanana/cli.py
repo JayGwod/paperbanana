@@ -25,15 +25,11 @@ console = Console()
 
 @app.command()
 def generate(
-    input: str = typer.Option(
-        ..., "--input", "-i", help="Path to methodology text file"
-    ),
+    input: str = typer.Option(..., "--input", "-i", help="Path to methodology text file"),
     caption: str = typer.Option(
         ..., "--caption", "-c", help="Figure caption / communicative intent"
     ),
-    output: Optional[str] = typer.Option(
-        None, "--output", "-o", help="Output image path"
-    ),
+    output: Optional[str] = typer.Option(None, "--output", "-o", help="Output image path"),
     vlm_provider: Optional[str] = typer.Option(
         None, "--vlm-provider", help="VLM provider (gemini)"
     ),
@@ -41,15 +37,11 @@ def generate(
     image_provider: Optional[str] = typer.Option(
         None, "--image-provider", help="Image gen provider"
     ),
-    image_model: Optional[str] = typer.Option(
-        None, "--image-model", help="Image gen model name"
-    ),
+    image_model: Optional[str] = typer.Option(None, "--image-model", help="Image gen model name"),
     iterations: Optional[int] = typer.Option(
         None, "--iterations", "-n", help="Refinement iterations"
     ),
-    config: Optional[str] = typer.Option(
-        None, "--config", help="Path to config YAML file"
-    ),
+    config: Optional[str] = typer.Option(None, "--config", help="Path to config YAML file"),
 ):
     """Generate a methodology diagram from a text description."""
     # Load source text
@@ -108,37 +100,25 @@ def generate(
         return await pipeline.generate(gen_input)
 
     with Progress(
-        SpinnerColumn(
-            spinner_name="line"
-        ),  # ASCII-safe spinner for Windows compatibility
+        SpinnerColumn(spinner_name="line"),  # ASCII-safe spinner for Windows compatibility
         TextColumn("[progress.description]{task.description}"),
         console=console,
     ) as progress:
         progress.add_task("Generating diagram...", total=None)
         result = asyncio.run(_run())
 
-    console.print(
-        f"\n[green]Done![/green] Output saved to: [bold]{result.image_path}[/bold]"
-    )
+    console.print(f"\n[green]Done![/green] Output saved to: [bold]{result.image_path}[/bold]")
     console.print(f"Run ID: {result.metadata.get('run_id', 'unknown')}")
     console.print(f"Total iterations: {len(result.iterations)}")
 
 
 @app.command()
 def plot(
-    data: str = typer.Option(
-        ..., "--data", "-d", help="Path to data file (CSV or JSON)"
-    ),
-    intent: str = typer.Option(
-        ..., "--intent", help="Communicative intent for the plot"
-    ),
-    output: Optional[str] = typer.Option(
-        None, "--output", "-o", help="Output image path"
-    ),
+    data: str = typer.Option(..., "--data", "-d", help="Path to data file (CSV or JSON)"),
+    intent: str = typer.Option(..., "--intent", help="Communicative intent for the plot"),
+    output: Optional[str] = typer.Option(None, "--output", "-o", help="Output image path"),
     vlm_provider: str = typer.Option("gemini", "--vlm-provider", help="VLM provider"),
-    iterations: int = typer.Option(
-        3, "--iterations", "-n", help="Number of refinement iterations"
-    ),
+    iterations: int = typer.Option(3, "--iterations", "-n", help="Number of refinement iterations"),
 ):
     """Generate a statistical plot from data."""
     data_path = Path(data)
@@ -195,9 +175,7 @@ def plot(
         return await pipeline.generate(gen_input)
 
     result = asyncio.run(_run())
-    console.print(
-        f"\n[green]Done![/green] Plot saved to: [bold]{result.image_path}[/bold]"
-    )
+    console.print(f"\n[green]Done![/green] Plot saved to: [bold]{result.image_path}[/bold]")
 
 
 @app.command()
@@ -243,16 +221,10 @@ def setup():
 
 @app.command()
 def evaluate(
-    generated: str = typer.Option(
-        ..., "--generated", "-g", help="Path to generated image"
-    ),
-    context: str = typer.Option(
-        ..., "--context", help="Path to source context text file"
-    ),
+    generated: str = typer.Option(..., "--generated", "-g", help="Path to generated image"),
+    context: str = typer.Option(..., "--context", help="Path to source context text file"),
     caption: str = typer.Option(..., "--caption", "-c", help="Figure caption"),
-    reference: str = typer.Option(
-        ..., "--reference", "-r", help="Path to human reference image"
-    ),
+    reference: str = typer.Option(..., "--reference", "-r", help="Path to human reference image"),
     vlm_provider: str = typer.Option(
         "gemini", "--vlm-provider", help="VLM provider for evaluation"
     ),

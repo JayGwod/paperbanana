@@ -243,9 +243,7 @@ class PaperBananaPipeline:
         iteration_timings = []
 
         for i in range(self.settings.refinement_iterations):
-            logger.info(
-                f"Phase 2: Iteration {i + 1}/{self.settings.refinement_iterations}"
-            )
+            logger.info(f"Phase 2: Iteration {i + 1}/{self.settings.refinement_iterations}")
 
             # Step 4: Visualizer — generate image
             visualizer_start = time.perf_counter()
