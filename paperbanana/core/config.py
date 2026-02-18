@@ -56,10 +56,10 @@ class Settings(BaseSettings):
     """Main PaperBanana settings, loaded from env vars and config files."""
 
     # Provider settings
-    vlm_provider: str = "gemini"
-    vlm_model: str = "gemini-2.0-flash"
-    image_provider: str = "google_imagen"
-    image_model: str = "gemini-3-pro-image-preview"
+    vlm_provider: str = Field(default="gemini", alias="VLM_PROVIDER")
+    vlm_model: str = Field(default="gemini-2.0-flash", alias="VLM_MODEL")
+    image_provider: str = Field(default="google_imagen", alias="IMAGE_PROVIDER")
+    image_model: str = Field(default="gemini-3-pro-image-preview", alias="IMAGE_MODEL")
 
     # Pipeline settings
     num_retrieval_examples: int = 10
