@@ -65,8 +65,7 @@ class CriticAgent(BaseAgent):
 
         if user_feedback:
             prompt += (
-                "\n\nAdditional user feedback to consider in your evaluation:\n"
-                f"{user_feedback}"
+                f"\n\nAdditional user feedback to consider in your evaluation:\n{user_feedback}"
             )
 
         logger.info("Running critic agent", image_path=image_path)

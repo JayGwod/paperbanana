@@ -53,9 +53,7 @@ def generate(
     optimize: bool = typer.Option(
         False, "--optimize", help="Preprocess inputs for better generation (parallel enrichment)"
     ),
-    continue_last: bool = typer.Option(
-        False, "--continue", help="Continue from the latest run"
-    ),
+    continue_last: bool = typer.Option(False, "--continue", help="Continue from the latest run"),
     continue_run: Optional[str] = typer.Option(
         None, "--continue-run", help="Continue from a specific run ID"
     ),
@@ -172,13 +170,10 @@ def generate(
                 console.print(f" [green]✓[/green] [dim]{elapsed:.1f}s[/dim]")
                 if result.needs_revision:
                     console.print(
-                        f"    [yellow]↻[/yellow] Revision needed: "
-                        f"[dim]{result.summary}[/dim]"
+                        f"    [yellow]↻[/yellow] Revision needed: [dim]{result.summary}[/dim]"
                     )
                 else:
-                    console.print(
-                        "    [green]✓[/green] [bold green]Critic satisfied[/bold green]"
-                    )
+                    console.print("    [green]✓[/green] [bold green]Critic satisfied[/bold green]")
                 return result
 
             pipeline.visualizer.run = _visualizer_run
@@ -192,9 +187,7 @@ def generate(
 
         result = asyncio.run(_run_continue())
 
-        console.print(
-            f"\n[green]Done![/green] Output saved to: [bold]{result.image_path}[/bold]"
-        )
+        console.print(f"\n[green]Done![/green] Output saved to: [bold]{result.image_path}[/bold]")
         console.print(f"Run ID: {result.metadata.get('run_id', 'unknown')}")
         console.print(f"New iterations: {len(result.iterations)}")
         return
@@ -275,8 +268,7 @@ def generate(
             t = time.perf_counter()
             result = await orig_planner_run(*a, **kw)
             console.print(
-                f" [green]✓[/green] [dim]{time.perf_counter() - t:.1f}s"
-                f" ({len(result)} chars)[/dim]"
+                f" [green]✓[/green] [dim]{time.perf_counter() - t:.1f}s ({len(result)} chars)[/dim]"
             )
             return result
 
@@ -290,8 +282,7 @@ def generate(
         async def _visualizer_run(*a, **kw):
             iteration = kw.get("iteration", "")
             total = (
-                settings.max_iterations if settings.auto_refine
-                else settings.refinement_iterations
+                settings.max_iterations if settings.auto_refine else settings.refinement_iterations
             )
             label = f"{iteration}/{total}"
             if settings.auto_refine:
@@ -314,9 +305,7 @@ def generate(
                 for s in result.critic_suggestions[:3]:
                     console.print(f"    [yellow]↻[/yellow] [dim]{s}[/dim]")
             else:
-                console.print(
-                    "    [green]✓[/green] [bold green]Critic satisfied[/bold green]"
-                )
+                console.print("    [green]✓[/green] [bold green]Critic satisfied[/bold green]")
             return result
 
         pipeline.optimizer.run = _optimizer_run

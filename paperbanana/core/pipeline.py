@@ -493,8 +493,7 @@ class PaperBananaPipeline:
         for i in range(total_iters):
             iter_num = start_iter + i + 1
             logger.info(
-                f"Phase 2: Iteration {iter_num}"
-                + (" (auto)" if self.settings.auto_refine else "")
+                f"Phase 2: Iteration {iter_num}" + (" (auto)" if self.settings.auto_refine else "")
             )
 
             # Visualizer — generate image
