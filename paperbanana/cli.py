@@ -14,6 +14,7 @@ from rich.prompt import Prompt
 
 from paperbanana.core.config import Settings
 from paperbanana.core.types import DiagramType, GenerationInput
+from paperbanana.core.utils import generate_run_id
 
 app = typer.Typer(
     name="paperbanana",
@@ -42,6 +43,11 @@ def generate(
         None, "--iterations", "-n", help="Refinement iterations"
     ),
     config: Optional[str] = typer.Option(None, "--config", help="Path to config YAML file"),
+    dry_run: bool = typer.Option(
+        False,
+        "--dry-run",
+        help="Validate inputs and show what would happen without making API calls",
+    ),
 ):
     """Generate a methodology diagram from a text description."""
     # Load source text
@@ -81,6 +87,26 @@ def generate(
         communicative_intent=caption,
         diagram_type=DiagramType.METHODOLOGY,
     )
+
+    if dry_run:
+        expected_output = (
+            Path(output)
+            if output
+            else Path(settings.output_dir) / generate_run_id() / "final_output.png"
+        )
+        console.print(
+            Panel.fit(
+                "[bold]PaperBanana[/bold] - Dry Run\n\n"
+                f"Input: {input_path}\n"
+                f"Caption: {caption}\n"
+                f"VLM: {settings.vlm_provider} / {settings.vlm_model}\n"
+                f"Image: {settings.image_provider} / {settings.image_model}\n"
+                f"Iterations: {settings.refinement_iterations}\n"
+                f"Output: {expected_output}",
+                border_style="yellow",
+            )
+        )
+        return
 
     console.print(
         Panel.fit(
