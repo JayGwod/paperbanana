@@ -65,7 +65,7 @@ def generate(
         None,
         "--aspect-ratio",
         "-ar",
-        help="Target aspect ratio (e.g., '16:9', '3:2', '1:1', '2:3', '9:16')",
+        help="Target aspect ratio: 1:1, 2:3, 3:2, 3:4, 4:3, 9:16, 16:9, 21:9",
     ),
     format: str = typer.Option(
         "png",
