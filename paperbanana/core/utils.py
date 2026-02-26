@@ -187,3 +187,30 @@ def find_prompt_dir() -> str:
         if (p / "evaluation").exists() or (p / "diagram").exists():
             return str(p)
     return "prompts"
+
+
+def detect_image_mime_type(path: str | Path) -> str:
+    """Detect the actual image MIME type from file header bytes.
+
+    Uses magic-byte detection rather than file extension, so the result
+    reflects the true encoding of the file on disk.
+    """
+    import mimetypes
+
+    with open(path, "rb") as f:
+        header = f.read(12)
+    if header[:8] == b"\x89PNG\r\n\x1a\n":
+        return "image/png"
+    if header[:2] == b"\xff\xd8":
+        return "image/jpeg"
+    if header[:4] == b"RIFF" and header[8:12] == b"WEBP":
+        return "image/webp"
+    if header[:4] == b"GIF8":
+        return "image/gif"
+    if header[:2] in (b"BM",):
+        return "image/bmp"
+    if header[:4] in (b"II\x2a\x00", b"MM\x00\x2a"):
+        return "image/tiff"
+    # Fall back to extension-based guess.
+    mime, _ = mimetypes.guess_type(str(path))
+    return mime or "application/octet-stream"
