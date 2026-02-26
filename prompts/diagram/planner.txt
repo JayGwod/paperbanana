@@ -33,7 +33,7 @@ After your detailed description, on a **new line**, output exactly one line in t
 ```
 RECOMMENDED_RATIO: <ratio>
 ```
-where `<ratio>` is one of: 1:1, 2:3, 3:2, 3:4, 4:3, 9:16, 16:9, 21:9.
+where `<ratio>` is one of: {supported_ratios}.
 
 Choose the best aspect ratio based on:
 - The **content structure**: pipelines and sequential flows → wide (16:9, 21:9); deep hierarchies or vertical stacks → tall (2:3, 9:16); balanced architectures → square-ish (1:1, 4:3, 3:4)
