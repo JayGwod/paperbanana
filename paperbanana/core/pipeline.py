@@ -502,7 +502,7 @@ class PaperBananaPipeline:
                 diagram_type=resume_state.diagram_type,
                 raw_data=resume_state.raw_data,
                 iteration=iter_num,
-                aspect_ratio=getattr(resume_state, 'aspect_ratio', None),
+                aspect_ratio=getattr(resume_state, "aspect_ratio", None),
             )
             visualizer_seconds = time.perf_counter() - visualizer_start
             logger.info(

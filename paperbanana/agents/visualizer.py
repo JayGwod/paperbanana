@@ -69,7 +69,13 @@ class VisualizerAgent(BaseAgent):
         if diagram_type == DiagramType.STATISTICAL_PLOT:
             return await self._generate_plot(description, raw_data, output_path, iteration)
         else:
-            return await self._generate_diagram(description, output_path, iteration, seed, aspect_ratio)
+            return await self._generate_diagram(
+                description,
+                output_path,
+                iteration,
+                seed,
+                aspect_ratio,
+            )
 
     async def _generate_diagram(
         self,

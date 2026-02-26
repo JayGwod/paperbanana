@@ -77,7 +77,6 @@ class OpenAIImageGen(ImageGenProvider):
         "9:16": "1024x1536",
     }
 
-
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(min=2, max=30))
     async def generate(
         self,

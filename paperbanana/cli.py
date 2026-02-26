@@ -62,7 +62,9 @@ def generate(
         None, "--feedback", help="User feedback for the critic when continuing a run"
     ),
     aspect_ratio: Optional[str] = typer.Option(
-        None, "--aspect-ratio", "-ar",
+        None,
+        "--aspect-ratio",
+        "-ar",
         help="Target aspect ratio (e.g., '16:9', '3:2', '1:1', '2:3', '9:16')",
     ),
     format: str = typer.Option(
