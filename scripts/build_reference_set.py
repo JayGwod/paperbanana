@@ -688,7 +688,7 @@ def main():
     with open(index_path, "w") as f:
         json.dump(index_data, f, indent=2, ensure_ascii=False)
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"Done! {len(all_new_examples)} new examples added.")
     print(f"Total examples: {len(all_examples)}")
     print(f"Index written to: {index_path}")

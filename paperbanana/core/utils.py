@@ -144,24 +144,6 @@ def hash_content(content: str) -> str:
     return hashlib.sha256(content.encode()).hexdigest()[:12]
 
 
-def find_prompt_dir() -> str:
-    """Locate the prompts directory, handling CWD != project root.
-
-    When PaperBanana is invoked via ``uvx`` or as an MCP server the working
-    directory is typically *not* the project root, so the default relative
-    ``"prompts"`` path fails.  This helper checks the CWD first, then
-    resolves relative to the installed package location.
-    """
-    candidates = [
-        Path("prompts"),
-        Path(__file__).resolve().parent.parent.parent / "prompts",
-    ]
-    for p in candidates:
-        if (p / "evaluation").exists() or (p / "diagram").exists():
-            return str(p)
-    return "prompts"
-
-
 def detect_image_mime_type(path: str | Path) -> str:
     """Detect the actual image MIME type from file header bytes.
 
@@ -187,3 +169,21 @@ def detect_image_mime_type(path: str | Path) -> str:
     # Fall back to extension-based guess.
     mime, _ = mimetypes.guess_type(str(path))
     return mime or "application/octet-stream"
+
+
+def find_prompt_dir() -> str:
+    """Locate the prompts directory, handling CWD != project root.
+
+    When PaperBanana is invoked via ``uvx`` or as an MCP server the working
+    directory is typically *not* the project root, so the default relative
+    ``"prompts"`` path fails.  This helper checks the CWD first, then
+    resolves relative to the installed package location.
+    """
+    candidates = [
+        Path("prompts"),
+        Path(__file__).resolve().parent.parent.parent / "prompts",
+    ]
+    for p in candidates:
+        if (p / "evaluation").exists() or (p / "diagram").exists():
+            return str(p)
+    return "prompts"

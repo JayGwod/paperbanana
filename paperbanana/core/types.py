@@ -24,6 +24,14 @@ class GenerationInput(BaseModel):
     raw_data: Optional[dict[str, Any]] = Field(
         default=None, description="Raw data for statistical plots (CSV path or dict)"
     )
+    aspect_ratio: Optional[str] = Field(
+        default=None,
+        description=(
+            "Target aspect ratio. "
+            "Supported: 1:1, 2:3, 3:2, 3:4, 4:3, 9:16, 16:9, 21:9. "
+            "If None, uses provider default."
+        ),
+    )
 
 
 class ReferenceExample(BaseModel):
@@ -34,6 +42,7 @@ class ReferenceExample(BaseModel):
     caption: str
     image_path: str
     category: Optional[str] = None
+    aspect_ratio: Optional[float] = None
 
 
 class CritiqueResult(BaseModel):

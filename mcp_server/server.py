@@ -4,9 +4,10 @@ Exposes PaperBanana's core functionality as MCP tools usable from
 Claude Code, Cursor, or any MCP client.
 
 Tools:
-    generate_diagram — Generate a methodology diagram from text
-    generate_plot    — Generate a statistical plot from JSON data
-    evaluate_diagram — Evaluate a generated diagram against a reference
+    generate_diagram    — Generate a methodology diagram from text
+    generate_plot       — Generate a statistical plot from JSON data
+    evaluate_diagram    — Evaluate a generated diagram against a reference
+    download_references — Download expanded reference set (~294 examples)
 
 Usage:
     paperbanana-mcp          # stdio transport (default)
@@ -112,24 +113,38 @@ async def generate_diagram(
     source_context: str,
     caption: str,
     iterations: int = 3,
+    aspect_ratio: str | None = None,
+    optimize: bool = False,
+    auto_refine: bool = False,
 ) -> Image:
     """Generate a publication-quality methodology diagram from text.
 
     Args:
         source_context: Methodology section text or relevant paper excerpt.
         caption: Figure caption describing what the diagram should communicate.
-        iterations: Number of refinement iterations (default 3).
+        iterations: Number of refinement iterations (default 3, used when auto_refine=False).
+        aspect_ratio: Target aspect ratio. Supported:
+            1:1, 2:3, 3:2, 3:4, 4:3, 9:16, 16:9, 21:9. Default: landscape.
+        optimize: Enrich context and sharpen caption before generation (default True).
+            Set False to skip preprocessing for faster results.
+        auto_refine: Let critic loop until satisfied (default True, max 30 iterations).
+            Set False to use fixed iteration count for faster results.
 
     Returns:
         The generated diagram as a PNG image.
     """
-    settings = Settings(refinement_iterations=iterations)
+    settings = Settings(
+        refinement_iterations=iterations,
+        optimize_inputs=optimize,
+        auto_refine=auto_refine,
+    )
     pipeline = PaperBananaPipeline(settings=settings)
 
     gen_input = GenerationInput(
         source_context=source_context,
         communicative_intent=caption,
         diagram_type=DiagramType.METHODOLOGY,
+        aspect_ratio=aspect_ratio,
     )
 
     result = await pipeline.generate(gen_input)
@@ -142,6 +157,9 @@ async def generate_plot(
     data_json: str,
     intent: str,
     iterations: int = 3,
+    aspect_ratio: str | None = None,
+    optimize: bool = False,
+    auto_refine: bool = False,
 ) -> Image:
     """Generate a publication-quality statistical plot from JSON data.
 
@@ -149,14 +167,24 @@ async def generate_plot(
         data_json: JSON string containing the data to plot.
             Example: '{"x": [1,2,3], "y": [4,5,6], "labels": ["a","b","c"]}'
         intent: Description of the desired plot (e.g. "Bar chart comparing model accuracy").
-        iterations: Number of refinement iterations (default 3).
+        iterations: Number of refinement iterations (default 3, used when auto_refine=False).
+        aspect_ratio: Target aspect ratio. Supported:
+            1:1, 2:3, 3:2, 3:4, 4:3, 9:16, 16:9, 21:9. Default: landscape.
+        optimize: Enrich context and sharpen caption before generation (default True).
+            Set False to skip preprocessing for faster results.
+        auto_refine: Let critic loop until satisfied (default True, max 30 iterations).
+            Set False to use fixed iteration count for faster results.
 
     Returns:
         The generated plot as a PNG image.
     """
     raw_data = json.loads(data_json)
 
-    settings = Settings(refinement_iterations=iterations)
+    settings = Settings(
+        refinement_iterations=iterations,
+        optimize_inputs=optimize,
+        auto_refine=auto_refine,
+    )
     pipeline = PaperBananaPipeline(settings=settings)
 
     gen_input = GenerationInput(
@@ -164,6 +192,7 @@ async def generate_plot(
         communicative_intent=intent,
         diagram_type=DiagramType.STATISTICAL_PLOT,
         raw_data=raw_data,
+        aspect_ratio=aspect_ratio,
     )
 
     result = await pipeline.generate(gen_input)
@@ -215,6 +244,47 @@ async def evaluate_diagram(
         f"Overall Winner: {scores.overall_winner} (score: {scores.overall_score})",
     ]
     return "\n".join(lines)
+
+
+@mcp.tool
+async def download_references(
+    force: bool = False,
+) -> str:
+    """Download the expanded reference set from official PaperBananaBench.
+
+    Downloads ~257MB of reference diagrams (294 examples) from HuggingFace
+    and caches them locally. The Retriever agent uses these for better
+    in-context learning during diagram generation.
+
+    Only needs to be run once — subsequent calls detect the cached data
+    and return immediately. Use force=True to re-download.
+
+    Args:
+        force: Re-download even if already cached.
+
+    Returns:
+        Status message with cache location and example count.
+    """
+    from paperbanana.data.manager import DatasetManager
+
+    dm = DatasetManager()
+
+    if dm.is_downloaded() and not force:
+        info = dm.get_info() or {}
+        return (
+            f"Expanded reference set already cached.\n"
+            f"Location: {dm.reference_dir}\n"
+            f"Examples: {dm.get_example_count()}\n"
+            f"Version: {info.get('version', 'unknown')}\n"
+            f"Use force=True to re-download."
+        )
+
+    count = dm.download(force=force)
+    return (
+        f"Downloaded {count} reference examples.\n"
+        f"Cached to: {dm.reference_dir}\n"
+        f"The Retriever agent will now use these for better diagram generation."
+    )
 
 
 def main():
