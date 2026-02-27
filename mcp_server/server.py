@@ -4,9 +4,10 @@ Exposes PaperBanana's core functionality as MCP tools usable from
 Claude Code, Cursor, or any MCP client.
 
 Tools:
-    generate_diagram — Generate a methodology diagram from text
-    generate_plot    — Generate a statistical plot from JSON data
-    evaluate_diagram — Evaluate a generated diagram against a reference
+    generate_diagram    — Generate a methodology diagram from text
+    generate_plot       — Generate a statistical plot from JSON data
+    evaluate_diagram    — Evaluate a generated diagram against a reference
+    download_references — Download expanded reference set (~294 examples)
 
 Usage:
     paperbanana-mcp          # stdio transport (default)
@@ -219,6 +220,47 @@ async def evaluate_diagram(
         f"Overall Winner: {scores.overall_winner} (score: {scores.overall_score})",
     ]
     return "\n".join(lines)
+
+
+@mcp.tool
+async def download_references(
+    force: bool = False,
+) -> str:
+    """Download the expanded reference set from official PaperBananaBench.
+
+    Downloads ~257MB of reference diagrams (294 examples) from HuggingFace
+    and caches them locally. The Retriever agent uses these for better
+    in-context learning during diagram generation.
+
+    Only needs to be run once — subsequent calls detect the cached data
+    and return immediately. Use force=True to re-download.
+
+    Args:
+        force: Re-download even if already cached.
+
+    Returns:
+        Status message with cache location and example count.
+    """
+    from paperbanana.data.manager import DatasetManager
+
+    dm = DatasetManager()
+
+    if dm.is_downloaded() and not force:
+        info = dm.get_info() or {}
+        return (
+            f"Expanded reference set already cached.\n"
+            f"Location: {dm.reference_dir}\n"
+            f"Examples: {dm.get_example_count()}\n"
+            f"Version: {info.get('version', 'unknown')}\n"
+            f"Use force=True to re-download."
+        )
+
+    count = dm.download(force=force)
+    return (
+        f"Downloaded {count} reference examples.\n"
+        f"Cached to: {dm.reference_dir}\n"
+        f"The Retriever agent will now use these for better diagram generation."
+    )
 
 
 def main():
