@@ -114,8 +114,8 @@ async def generate_diagram(
     caption: str,
     iterations: int = 3,
     aspect_ratio: str | None = None,
-    optimize: bool = True,
-    auto_refine: bool = True,
+    optimize: bool = False,
+    auto_refine: bool = False,
 ) -> Image:
     """Generate a publication-quality methodology diagram from text.
 
@@ -158,8 +158,8 @@ async def generate_plot(
     intent: str,
     iterations: int = 3,
     aspect_ratio: str | None = None,
-    optimize: bool = True,
-    auto_refine: bool = True,
+    optimize: bool = False,
+    auto_refine: bool = False,
 ) -> Image:
     """Generate a publication-quality statistical plot from JSON data.
 
