@@ -425,6 +425,12 @@ def plot(
         "-ar",
         help="Target aspect ratio: 1:1, 2:3, 3:2, 3:4, 4:3, 9:16, 16:9, 21:9",
     ),
+    optimize: bool = typer.Option(
+        False, "--optimize", help="Enrich context and sharpen caption before generation"
+    ),
+    auto: bool = typer.Option(
+        False, "--auto", help="Let critic loop until satisfied (max 30 iterations)"
+    ),
 ):
     """Generate a statistical plot from data."""
     if format not in ("png", "jpeg", "webp"):
@@ -462,6 +468,8 @@ def plot(
         vlm_provider=vlm_provider,
         refinement_iterations=iterations,
         output_format=format,
+        optimize_inputs=optimize,
+        auto_refine=auto,
     )
 
     gen_input = GenerationInput(

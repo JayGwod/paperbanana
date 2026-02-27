@@ -114,6 +114,8 @@ async def generate_diagram(
     caption: str,
     iterations: int = 3,
     aspect_ratio: str | None = None,
+    optimize: bool = False,
+    auto_refine: bool = False,
 ) -> Image:
     """Generate a publication-quality methodology diagram from text.
 
@@ -123,11 +125,17 @@ async def generate_diagram(
         iterations: Number of refinement iterations (default 3).
         aspect_ratio: Target aspect ratio. Supported:
             1:1, 2:3, 3:2, 3:4, 4:3, 9:16, 16:9, 21:9. Default: landscape.
+        optimize: Enrich context and sharpen caption before generation (default False).
+        auto_refine: Let critic loop until satisfied instead of fixed iterations (default False).
 
     Returns:
         The generated diagram as a PNG image.
     """
-    settings = Settings(refinement_iterations=iterations)
+    settings = Settings(
+        refinement_iterations=iterations,
+        optimize_inputs=optimize,
+        auto_refine=auto_refine,
+    )
     pipeline = PaperBananaPipeline(settings=settings)
 
     gen_input = GenerationInput(
@@ -148,6 +156,8 @@ async def generate_plot(
     intent: str,
     iterations: int = 3,
     aspect_ratio: str | None = None,
+    optimize: bool = False,
+    auto_refine: bool = False,
 ) -> Image:
     """Generate a publication-quality statistical plot from JSON data.
 
@@ -158,13 +168,19 @@ async def generate_plot(
         iterations: Number of refinement iterations (default 3).
         aspect_ratio: Target aspect ratio. Supported:
             1:1, 2:3, 3:2, 3:4, 4:3, 9:16, 16:9, 21:9. Default: landscape.
+        optimize: Enrich context and sharpen caption before generation (default False).
+        auto_refine: Let critic loop until satisfied instead of fixed iterations (default False).
 
     Returns:
         The generated plot as a PNG image.
     """
     raw_data = json.loads(data_json)
 
-    settings = Settings(refinement_iterations=iterations)
+    settings = Settings(
+        refinement_iterations=iterations,
+        optimize_inputs=optimize,
+        auto_refine=auto_refine,
+    )
     pipeline = PaperBananaPipeline(settings=settings)
 
     gen_input = GenerationInput(
