@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 """Import reference examples from the official PaperBananaBench dataset.
 
-Downloads the dataset from HuggingFace and converts it to the community
-project's index.json format for use by the Retriever agent.
+This script is a thin CLI wrapper around DatasetManager for manual imports.
+For most users, `paperbanana data download` is the recommended approach.
 
 Usage:
-    # Download and import diagram references (default)
+    # Download and cache expanded references (recommended)
+    paperbanana data download
+
+    # Or use this script directly:
     python scripts/import_official_references.py
 
     # Import from a local PaperBananaBench directory
@@ -26,27 +29,6 @@ import zipfile
 from pathlib import Path
 
 from PIL import Image
-
-HF_DATASET_URL = (
-    "https://huggingface.co/datasets/dwzhu/PaperBananaBench/resolve/main/PaperBananaBench.zip"
-)
-
-# Field mapping: official → community
-FIELD_MAP_DIAGRAM = {
-    "id": "id",
-    "content": "source_context",
-    "visual_intent": "caption",
-    "path_to_gt_image": "image_path",
-    "category": "category",
-}
-
-FIELD_MAP_PLOT = {
-    "id": "id",
-    "content": "source_context",  # JSON data for plots
-    "visual_intent": "caption",
-    "path_to_gt_image": "image_path",
-    "category": "category",
-}
 
 
 def compute_aspect_ratio(image_path: Path) -> float | None:
@@ -103,6 +85,28 @@ def convert_ref_entry(
     result["source_paper"] = result["id"]
 
     return result
+
+
+# Field mapping: official → community
+FIELD_MAP_DIAGRAM = {
+    "id": "id",
+    "content": "source_context",
+    "visual_intent": "caption",
+    "path_to_gt_image": "image_path",
+    "category": "category",
+}
+
+FIELD_MAP_PLOT = {
+    "id": "id",
+    "content": "source_context",  # JSON data for plots
+    "visual_intent": "caption",
+    "path_to_gt_image": "image_path",
+    "category": "category",
+}
+
+HF_DATASET_URL = (
+    "https://huggingface.co/datasets/dwzhu/PaperBananaBench/resolve/main/PaperBananaBench.zip"
+)
 
 
 def import_references(
@@ -218,7 +222,10 @@ def download_dataset(dest_dir: Path) -> Path:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Import official PaperBananaBench references into community format."
+        description=(
+            "Import official PaperBananaBench references.\n\n"
+            "Recommended: use 'paperbanana data download' instead."
+        ),
     )
     parser.add_argument(
         "--local",
@@ -235,8 +242,8 @@ def main():
     parser.add_argument(
         "--output",
         type=str,
-        default="data/reference_sets",
-        help="Output directory (default: data/reference_sets)",
+        default=None,
+        help="Output directory (default: ~/.cache/paperbanana/reference_sets)",
     )
     parser.add_argument(
         "--keep-existing",
@@ -245,7 +252,14 @@ def main():
     )
     args = parser.parse_args()
 
-    output_dir = Path(args.output)
+    # Default to cache dir if no output specified
+    if args.output:
+        output_dir = Path(args.output)
+    else:
+        from paperbanana.data.manager import default_cache_dir
+
+        output_dir = default_cache_dir() / "reference_sets"
+
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Backup existing index.json
