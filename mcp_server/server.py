@@ -147,6 +147,7 @@ async def generate_plot(
     data_json: str,
     intent: str,
     iterations: int = 3,
+    aspect_ratio: str | None = None,
 ) -> Image:
     """Generate a publication-quality statistical plot from JSON data.
 
@@ -155,6 +156,8 @@ async def generate_plot(
             Example: '{"x": [1,2,3], "y": [4,5,6], "labels": ["a","b","c"]}'
         intent: Description of the desired plot (e.g. "Bar chart comparing model accuracy").
         iterations: Number of refinement iterations (default 3).
+        aspect_ratio: Target aspect ratio. Supported:
+            1:1, 2:3, 3:2, 3:4, 4:3, 9:16, 16:9, 21:9. Default: landscape.
 
     Returns:
         The generated plot as a PNG image.
@@ -169,6 +172,7 @@ async def generate_plot(
         communicative_intent=intent,
         diagram_type=DiagramType.STATISTICAL_PLOT,
         raw_data=raw_data,
+        aspect_ratio=aspect_ratio,
     )
 
     result = await pipeline.generate(gen_input)
