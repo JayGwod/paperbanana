@@ -67,7 +67,9 @@ class VisualizerAgent(BaseAgent):
             Path to the generated image.
         """
         if diagram_type == DiagramType.STATISTICAL_PLOT:
-            return await self._generate_plot(description, raw_data, output_path, iteration)
+            return await self._generate_plot(
+                description, raw_data, output_path, iteration, aspect_ratio
+            )
         else:
             return await self._generate_diagram(
                 description,
@@ -130,6 +132,7 @@ class VisualizerAgent(BaseAgent):
         raw_data: Optional[dict],
         output_path: Optional[str],
         iteration: int,
+        aspect_ratio: Optional[str] = None,
     ) -> str:
         """Generate a statistical plot by generating and executing matplotlib code."""
         # Build the description with raw data appended
@@ -158,7 +161,7 @@ class VisualizerAgent(BaseAgent):
             output_path = str(self.output_dir / f"plot_iter_{iteration}.png")
 
         # Execute the code
-        success = self._execute_plot_code(code, output_path)
+        success = self._execute_plot_code(code, output_path, aspect_ratio)
         if not success:
             logger.error("Plot code execution failed, using placeholder")
             # Create a placeholder image
@@ -186,15 +189,25 @@ class VisualizerAgent(BaseAgent):
             return response[start:end].strip()
         return response.strip()
 
-    def _execute_plot_code(self, code: str, output_path: str) -> bool:
+    def _execute_plot_code(
+        self, code: str, output_path: str, aspect_ratio: Optional[str] = None
+    ) -> bool:
         """Execute matplotlib code in a subprocess to generate a plot."""
         # Strip any OUTPUT_PATH assignments from VLM-generated code so the
         # injected value below is authoritative (the VLM is prompted to set
         # OUTPUT_PATH itself, which would override the injected line).
         code = re.sub(r'^OUTPUT_PATH\s*=\s*["\'].*["\']\s*$', "", code, flags=re.MULTILINE)
 
-        # Inject the output path
-        full_code = f'OUTPUT_PATH = "{output_path}"\n{code}'
+        # Inject the output path and figure size from aspect ratio
+        figsize_line = ""
+        if aspect_ratio:
+            w, h = self._ratio_to_dimensions(aspect_ratio)
+            # Scale to reasonable matplotlib inches (assume 150 dpi)
+            fig_w, fig_h = round(w / 150, 1), round(h / 150, 1)
+            figsize_line = (
+                f"import matplotlib\nmatplotlib.rcParams['figure.figsize'] = [{fig_w}, {fig_h}]\n"
+            )
+        full_code = f'OUTPUT_PATH = "{output_path}"\n{figsize_line}{code}'
 
         # Ensure output directory exists
         Path(output_path).parent.mkdir(parents=True, exist_ok=True)
