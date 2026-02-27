@@ -31,9 +31,6 @@ run_*/
 *.jpeg
 !data/reference_sets/**/*.png
 !data/reference_sets/**/*.jpg
-# Ignore imported reference images (from import_official_references.py)
-# while keeping the original curated set (arXiv ID-named files) tracked
-data/reference_sets/images/ref_*.jpg
 !assets/img/hero_image.png
 
 # Reference set build artifacts (large, copyrighted PDFs)
