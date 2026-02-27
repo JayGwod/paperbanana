@@ -160,6 +160,12 @@ class VisualizerAgent(BaseAgent):
         if output_path is None:
             output_path = str(self.output_dir / f"plot_iter_{iteration}.png")
 
+        # Save generated code for inspection / manual editing
+        code_path = Path(output_path).with_suffix(".py")
+        code_path.parent.mkdir(parents=True, exist_ok=True)
+        code_path.write_text(code)
+        logger.info("Plot code saved", path=str(code_path))
+
         # Execute the code
         success = self._execute_plot_code(code, output_path, aspect_ratio)
         if not success:
