@@ -114,19 +114,21 @@ async def generate_diagram(
     caption: str,
     iterations: int = 3,
     aspect_ratio: str | None = None,
-    optimize: bool = False,
-    auto_refine: bool = False,
+    optimize: bool = True,
+    auto_refine: bool = True,
 ) -> Image:
     """Generate a publication-quality methodology diagram from text.
 
     Args:
         source_context: Methodology section text or relevant paper excerpt.
         caption: Figure caption describing what the diagram should communicate.
-        iterations: Number of refinement iterations (default 3).
+        iterations: Number of refinement iterations (default 3, used when auto_refine=False).
         aspect_ratio: Target aspect ratio. Supported:
             1:1, 2:3, 3:2, 3:4, 4:3, 9:16, 16:9, 21:9. Default: landscape.
-        optimize: Enrich context and sharpen caption before generation (default False).
-        auto_refine: Let critic loop until satisfied instead of fixed iterations (default False).
+        optimize: Enrich context and sharpen caption before generation (default True).
+            Set False to skip preprocessing for faster results.
+        auto_refine: Let critic loop until satisfied (default True, max 30 iterations).
+            Set False to use fixed iteration count for faster results.
 
     Returns:
         The generated diagram as a PNG image.
@@ -156,8 +158,8 @@ async def generate_plot(
     intent: str,
     iterations: int = 3,
     aspect_ratio: str | None = None,
-    optimize: bool = False,
-    auto_refine: bool = False,
+    optimize: bool = True,
+    auto_refine: bool = True,
 ) -> Image:
     """Generate a publication-quality statistical plot from JSON data.
 
@@ -165,11 +167,13 @@ async def generate_plot(
         data_json: JSON string containing the data to plot.
             Example: '{"x": [1,2,3], "y": [4,5,6], "labels": ["a","b","c"]}'
         intent: Description of the desired plot (e.g. "Bar chart comparing model accuracy").
-        iterations: Number of refinement iterations (default 3).
+        iterations: Number of refinement iterations (default 3, used when auto_refine=False).
         aspect_ratio: Target aspect ratio. Supported:
             1:1, 2:3, 3:2, 3:4, 4:3, 9:16, 16:9, 21:9. Default: landscape.
-        optimize: Enrich context and sharpen caption before generation (default False).
-        auto_refine: Let critic loop until satisfied instead of fixed iterations (default False).
+        optimize: Enrich context and sharpen caption before generation (default True).
+            Set False to skip preprocessing for faster results.
+        auto_refine: Let critic loop until satisfied (default True, max 30 iterations).
+            Set False to use fixed iteration count for faster results.
 
     Returns:
         The generated plot as a PNG image.
