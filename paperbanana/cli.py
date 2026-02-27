@@ -419,6 +419,12 @@ def plot(
     verbose: bool = typer.Option(
         False, "--verbose", "-v", help="Show detailed agent progress and timing"
     ),
+    aspect_ratio: Optional[str] = typer.Option(
+        None,
+        "--aspect-ratio",
+        "-ar",
+        help="Target aspect ratio: 1:1, 2:3, 3:2, 3:4, 4:3, 9:16, 16:9, 21:9",
+    ),
 ):
     """Generate a statistical plot from data."""
     if format not in ("png", "jpeg", "webp"):
@@ -463,6 +469,7 @@ def plot(
         communicative_intent=intent,
         diagram_type=DiagramType.STATISTICAL_PLOT,
         raw_data={"data": raw_data},
+        aspect_ratio=aspect_ratio,
     )
 
     console.print(
